@@ -27,7 +27,7 @@ def rainbow_ascii(art):
 def wrap_text(text, width=40):
     return '\n'.join([text[i:i+width] for i in range(0, len(text), width)])
 
-def print_speech_bubble(text, bubble_shape='rounded'):
+def print_speech_bubble(text, bubble_shape='rounded', glasses=None):
     wrapped_text = wrap_text(text)
     lines = wrapped_text.split('\n')
     max_line_length = max(len(line) for line in lines)
@@ -48,6 +48,10 @@ def print_speech_bubble(text, bubble_shape='rounded'):
         raise ValueError(f"Unknown bubble shape: {bubble_shape}")
 
     bubble = [top] + sides + [bottom]
+    
+    if glasses:
+        bubble = [line.replace("( ", f"( {glasses} ") for line in bubble]
+
     return "\n".join(bubble)
 
 def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None):
@@ -96,10 +100,7 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
 
     console = Console()
 
-    speech_bubble = print_speech_bubble(text, bubble_shape)
-    if glasses:
-        speech_bubble = speech_bubble.replace("( ", f"( {glasses} ")
-
+    speech_bubble = print_speech_bubble(text, bubble_shape, glasses)
     if rainbow:
         console.print(rainbow_text(speech_bubble))
     else:
@@ -107,11 +108,15 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
 
     if name in ["cat", "fox"] and animate:
         for frame in animals[name]:
+            if glasses:
+                frame = frame.replace("o.o", f"{glasses}{glasses}")
             console.print(rainbow_ascii(frame) if rainbow else frame)
             time.sleep(0.5)
             console.clear()
     else:
         animal_art = animals.get(name, animals.get("cow"))
+        if glasses:
+            animal_art = animal_art.replace("oo", f"{glasses}{glasses}")
         console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
 
 def play_sound(animal):
@@ -175,4 +180,4 @@ def main():
         play_sound(animal_name)
 
 if __name__ == "__main__":
-    main() 
+    main()
