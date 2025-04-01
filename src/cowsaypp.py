@@ -50,7 +50,7 @@ def print_speech_bubble(text, bubble_shape='rounded'):
     bubble = [top] + sides + [bottom]
     return "\n".join(bubble)
 
-def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False):
+def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None):
     animals = {
         "cow": r'''
           \   ^__^
@@ -97,6 +97,9 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
     console = Console()
 
     speech_bubble = print_speech_bubble(text, bubble_shape)
+    if glasses:
+        speech_bubble = speech_bubble.replace("( ", f"( {glasses} ")
+
     if rainbow:
         console.print(rainbow_text(speech_bubble))
     else:
@@ -135,7 +138,7 @@ def load_custom_animal():
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c]")
+        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c] [-g <glasses>]")
         sys.exit(1)
 
     text = sys.argv[1]
@@ -146,6 +149,7 @@ def main():
     sound = "-s" in sys.argv
     custom = "-c" in sys.argv
     bubble_shape = 'rounded'
+    glasses = None
 
     if "-b" in sys.argv:
         try:
@@ -154,12 +158,15 @@ def main():
             print("Error: Missing argument for -b")
             sys.exit(1)
 
+    if "-g" in sys.argv:
+        glasses = sys.argv[sys.argv.index("-g") + 1]
+
     if custom:
         animal_art = load_custom_animal()
         console = Console()
         console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
     else:
-        print_animal(animal_name, text, rainbow, bubble_shape, animate)
+        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses)
 
     if speak:
         tts_speak(text)
@@ -168,4 +175,4 @@ def main():
         play_sound(animal_name)
 
 if __name__ == "__main__":
-    main()
+    main() 
