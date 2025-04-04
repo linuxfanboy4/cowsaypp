@@ -6,6 +6,8 @@ import pyttsx3
 from playsound import playsound
 from rich.console import Console
 from rich.text import Text
+from PIL import Image, ImageDraw, ImageFont
+import io
 
 def rainbow_text(text):
     colors = ["red", "yellow", "green", "blue", "magenta", "cyan", "white"]
@@ -27,8 +29,8 @@ def rainbow_ascii(art):
 def wrap_text(text, width=40):
     return '\n'.join([text[i:i+width] for i in range(0, len(text), width)])
 
-def print_speech_bubble(text, bubble_shape='rounded', glasses=None):
-    wrapped_text = wrap_text(text)
+def print_speech_bubble(text, bubble_shape='rounded', glasses=None, width=40):
+    wrapped_text = wrap_text(text, width)
     lines = wrapped_text.split('\n')
     max_line_length = max(len(line) for line in lines)
 
@@ -44,17 +46,25 @@ def print_speech_bubble(text, bubble_shape='rounded', glasses=None):
         top = f" *{'*' * (max_line_length + 2)}*"
         bottom = f" *{'*' * (max_line_length + 2)}*"
         sides = [f" * {line.ljust(max_line_length)} *" for line in lines]
+    elif bubble_shape == 'triangle':
+        top = f"  {'^' * (max_line_length + 2)}"
+        bottom = f"  {'v' * (max_line_length + 2)}"
+        sides = [f" / {line.ljust(max_line_length)} \\" for line in lines]
+    elif bubble_shape == 'cloud':
+        top = f"   .-""" + "-" * (max_line_length + 2) + '-.'
+        bottom = f"  `-'`-" * (max_line_length + 2) + '`-`'
+        sides = [f" ( {line.ljust(max_line_length)} )" for line in lines]
     else:
         raise ValueError(f"Unknown bubble shape: {bubble_shape}")
 
     bubble = [top] + sides + [bottom]
-    
+
     if glasses:
         bubble = [line.replace("( ", f"( {glasses} ") for line in bubble]
 
     return "\n".join(bubble)
 
-def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None):
+def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None, width=40, height=10):
     animals = {
         "cow": r'''
           \   ^__^
@@ -74,39 +84,39 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
             r'''
         /\_/\
        ( o.o )
-        > ^ <  
-        ''',
+        > ^ <
+            ''',
             r'''
         /\_/\
        ( -.- )
-        > ^ <  
-        '''
+        > ^ <
+            '''
         ],
         "fox": [
             r'''
        /\   /\
       ( o . o )
-       (  V  )  
-       /     \ 
-        ''',
+       (  V  )
+       /     \
+            ''',
             r'''
       /\   /\
       ( - . - )
-       (  V  )  
-       /     \ 
-        '''
+       (  V  )
+       /     \
+            '''
         ]
     }
 
     console = Console()
 
-    speech_bubble = print_speech_bubble(text, bubble_shape, glasses)
+    speech_bubble = print_speech_bubble(text, bubble_shape, glasses, width)
     if rainbow:
         console.print(rainbow_text(speech_bubble))
     else:
         console.print(speech_bubble)
 
-    if name in ["cat", "fox"] and animate:
+    if name in ["cat", "fox", "dog", "cow"] and animate:
         for frame in animals[name]:
             if glasses:
                 frame = frame.replace("o.o", f"{glasses}{glasses}")
@@ -133,17 +143,26 @@ def tts_speak(text):
     engine.say(text)
     engine.runAndWait()
 
-def load_custom_animal():
+def load_custom_animal(file_name="custom.txt"):
     try:
-        with open("custom.txt", "r") as file:
+        with open(file_name, "r") as file:
             return file.read()
     except FileNotFoundError:
-        print("Error: custom.txt not found!")
+        print(f"Error: {file_name} not found!")
         sys.exit(1)
+
+def convert_to_png(art, width=40, height=10):
+    img = Image.new('RGB', (width * 10, height * 20), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
+    draw.text((10, 10), art, fill="black", font=font)
+    img_path = 'output.png'
+    img.save(img_path)
+    print(f"Image saved to {img_path}")
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c] [-g <glasses>]")
+        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c <file_name>] [-g <glasses>] [-size <width> <height>] [-convert png]")
         sys.exit(1)
 
     text = sys.argv[1]
@@ -155,6 +174,9 @@ def main():
     custom = "-c" in sys.argv
     bubble_shape = 'rounded'
     glasses = None
+    width = 40
+    height = 10
+    convert_png = "-convert" in sys.argv and "png" in sys.argv
 
     if "-b" in sys.argv:
         try:
@@ -166,18 +188,31 @@ def main():
     if "-g" in sys.argv:
         glasses = sys.argv[sys.argv.index("-g") + 1]
 
+    if "-size" in sys.argv:
+        try:
+            width = int(sys.argv[sys.argv.index("-size") + 1])
+            height = int(sys.argv[sys.argv.index("-size") + 2])
+        except IndexError:
+            print("Error: Missing arguments for -size")
+            sys.exit(1)
+
     if custom:
-        animal_art = load_custom_animal()
+        custom_file = sys.argv[sys.argv.index("-c") + 1] if len(sys.argv) > sys.argv.index("-c") + 1 else "custom.txt"
+        animal_art = load_custom_animal(custom_file)
         console = Console()
         console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
     else:
-        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses)
+        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses, width, height)
 
     if speak:
         tts_speak(text)
 
     if sound:
         play_sound(animal_name)
+
+    if convert_png:
+        animal_art = animals.get(animal_name, animals.get("cow"))
+        convert_to_png(animal_art, width, height)
 
 if __name__ == "__main__":
     main()
