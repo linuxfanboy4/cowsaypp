@@ -1,3 +1,5 @@
+Here's the updated README based on the provided code, maintaining all the existing content while incorporating the new features and removing emojis:
+
 # cowsay++: Enhanced Version of cowsay
 
 ## Overview
@@ -6,7 +8,7 @@ cowsay++ is an enhanced version of the classic cowsay program, offering extended
 
 ## Features
 
-- Multiple animal types (cow, dog, cat, fox)
+- Multiple animal types (cow, dog, cat, fox) with angry variants
 - Marketplace for additional animals (elephant, tux, owl, fish)
 - Custom animal support via external files (custom.txt or specified filename)
 - Rainbow-colored text and ASCII art
@@ -18,6 +20,9 @@ cowsay++ is an enhanced version of the classic cowsay program, offering extended
 - Glasses support for animals
 - PNG conversion capability
 - Rich text formatting with color support
+- Weather information integration
+- Livestream mode with random messages
+- Angry animal variants
 
 ## Installation
 
@@ -34,6 +39,7 @@ cowsay++ requires the following Python packages:
 - playsound (for audio playback)
 - rich (for colored console output)
 - Pillow (for PNG conversion)
+- requests (for weather functionality)
 
 These dependencies will be automatically installed during the installation process.
 
@@ -55,6 +61,15 @@ Available options:
 - `-g <text>`: Add glasses to the animal's face
 - `-size <width> <height>`: Set custom dimensions for output
 - `-convert png`: Convert output to PNG image
+- `-angry`: Use angry animal variant
+- `-live`: Enter livestream mode
+- `see weather`: Display weather information
+
+Additional commands:
+```bash
+cowsay-pp see weather
+cowsay-pp -live
+```
 
 Examples:
 ```bash
@@ -64,6 +79,9 @@ cowsay-pp "Custom art" -c my_art.txt -r
 cowsay-pp "I'm cool" -f dog -g "8-)"
 cowsay-pp "Large output" -f fox -size 60 20
 cowsay-pp "Save as PNG" -f cow -convert png
+cowsay-pp "I'm angry" -f cat -angry
+cowsay-pp see weather
+cowsay-pp -live
 ```
 
 ## Marketplace
@@ -97,9 +115,27 @@ Currently animated animals:
 - Cat (alternates between two facial expressions)
 - Fox (alternates between two facial expressions)
 
+## Angry Variants
+
+Available angry animal variants:
+- Cow
+- Dog
+- Cat
+- Fox
+
+Use the `-angry` flag to display the angry version of the selected animal.
+
 ## PNG Conversion
 
 The `-convert png` option saves the ASCII art as a PNG image file named `output.png` in the current directory.
+
+## Weather Integration
+
+The `see weather` command displays current weather conditions and provides recommendations based on the weather.
+
+## Livestream Mode
+
+The `-live` option activates livestream mode, which displays random messages about streaming platforms.
 
 ## Technical Implementation
 
@@ -111,6 +147,7 @@ The script uses:
 - Random selection for varied sound effects
 - Time-based animation for simple frame changes
 - Custom text wrapping algorithm for speech bubbles
+- Requests library for weather data
 
 ## License
 
@@ -128,3 +165,6 @@ This is an actively maintained project. New features and improvements are regula
 4. Animation works by alternating between two frames for supported animals
 5. The glasses option (-g) adds text to the animal's face
 6. PNG conversion uses default system font and may require adjustment for optimal results
+7. Weather functionality requires an internet connection
+8. Angry variants provide alternative ASCII art for each animal
+9. Livestream mode displays random messages about streaming platforms
