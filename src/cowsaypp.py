@@ -7,7 +7,9 @@ from playsound import playsound
 from rich.console import Console
 from rich.text import Text
 from PIL import Image, ImageDraw, ImageFont
-import io
+import requests
+
+console = Console()
 
 def rainbow_text(text):
     colors = ["red", "yellow", "green", "blue", "magenta", "cyan", "white"]
@@ -51,7 +53,7 @@ def print_speech_bubble(text, bubble_shape='rounded', glasses=None, width=40):
         bottom = f"  {'v' * (max_line_length + 2)}"
         sides = [f" / {line.ljust(max_line_length)} \\" for line in lines]
     elif bubble_shape == 'cloud':
-        top = f"   .-""" + "-" * (max_line_length + 2) + '-.'
+        top = f"   .-" + "-" * (max_line_length + 2) + '-.'
         bottom = f"  `-'`-" * (max_line_length + 2) + '`-`'
         sides = [f" ( {line.ljust(max_line_length)} )" for line in lines]
     else:
@@ -64,13 +66,20 @@ def print_speech_bubble(text, bubble_shape='rounded', glasses=None, width=40):
 
     return "\n".join(bubble)
 
-def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None, width=40, height=10):
+def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None, width=40, height=10, angry=False):
     animals = {
         "cow": r'''
           \   ^__^
            \  (oo)\_______
               (__)\       )\/\
                   ||----w |
+                  ||     ||
+        ''',
+        "cow-angry": r'''
+          \   ^!!^
+           \  (><)\_______
+              (__)\       )\/\
+                  ||----# |
                   ||     ||
         ''',
         "dog": r'''
@@ -80,35 +89,54 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
       /   (_____ /
      /_____/   U
         ''',
-        "cat": [
-            r'''
+        "dog-angry": r'''
+        \   / \__
+        (    >@___
+        /         #
+      /   (_____ /
+     /_____/   U
+        ''',
+        "cat": [r'''
         /\_/\
        ( o.o )
         > ^ <
-            ''',
-            r'''
+        ''', r'''
         /\_/\
        ( -.- )
         > ^ <
-            '''
-        ],
-        "fox": [
-            r'''
+        '''],
+        "cat-angry": [r'''
+        /\_/\
+       ( >.< )
+        > ^ <
+        ''', r'''
+        /\_/\
+       ( x.x )
+        > ^ <
+        '''],
+        "fox": [r'''
        /\   /\
       ( o . o )
        (  V  )
        /     \
-            ''',
-            r'''
+        ''', r'''
       /\   /\
       ( - . - )
        (  V  )
        /     \
-            '''
-        ]
+        '''],
+        "fox-angry": [r'''
+       /\   /\
+      ( > . < )
+       (  V  )
+       /     \
+        ''', r'''
+      /\   /\
+      ( x . x )
+       (  V  )
+       /     \
+        ''']
     }
-
-    console = Console()
 
     speech_bubble = print_speech_bubble(text, bubble_shape, glasses, width)
     if rainbow:
@@ -116,18 +144,16 @@ def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=Fals
     else:
         console.print(speech_bubble)
 
-    if name in ["cat", "fox", "dog", "cow"] and animate:
-        for frame in animals[name]:
-            if glasses:
-                frame = frame.replace("o.o", f"{glasses}{glasses}")
+    key = name + "-angry" if angry else name
+
+    if key in ["cat", "fox", "cat-angry", "fox-angry"] and animate:
+        for frame in animals[key]:
             console.print(rainbow_ascii(frame) if rainbow else frame)
             time.sleep(0.5)
             console.clear()
     else:
-        animal_art = animals.get(name, animals.get("cow"))
-        if glasses:
-            animal_art = animal_art.replace("oo", f"{glasses}{glasses}")
-        console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
+        art = animals.get(key, animals.get("cow"))
+        console.print(rainbow_ascii(art) if rainbow else art)
 
 def play_sound(animal):
     sounds = {
@@ -144,12 +170,8 @@ def tts_speak(text):
     engine.runAndWait()
 
 def load_custom_animal(file_name="custom.txt"):
-    try:
-        with open(file_name, "r") as file:
-            return file.read()
-    except FileNotFoundError:
-        print(f"Error: {file_name} not found!")
-        sys.exit(1)
+    with open(file_name, "r") as file:
+        return file.read()
 
 def convert_to_png(art, width=40, height=10):
     img = Image.new('RGB', (width * 10, height * 20), color=(255, 255, 255))
@@ -160,9 +182,37 @@ def convert_to_png(art, width=40, height=10):
     img.save(img_path)
     print(f"Image saved to {img_path}")
 
+def get_weather():
+    response = requests.get("https://wttr.in?format=%C+%t")
+    result = response.text.strip()
+    condition = result.split()[0]
+    if condition == "Sunny":
+        print("Man, it's kind of hot 🔥🔥🔥 you gotta go Antarctica or Switzerland")
+    elif condition == "Clear":
+        print("Man, there's few or even no cloud ☁️ I warned you that still you had time, go to Antarctica or Switzerland")
+    else:
+        print(f"Weather says: {result}")
+
+def livestream_mode():
+    messages = [
+        "what in the world this is 😒",
+        "it's better I should uninstall twitch 😒",
+        "it's always good practice to not watch live"
+    ]
+    msg = random.choice(messages)
+    print_animal("cow", msg, angry=True)
+
 def main():
+    if len(sys.argv) >= 2 and sys.argv[1].lower() == "see" and sys.argv[2].lower() == "weather":
+        get_weather()
+        return
+
+    if "-live" in sys.argv:
+        livestream_mode()
+        return
+
     if len(sys.argv) < 4:
-        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c <file_name>] [-g <glasses>] [-size <width> <height>] [-convert png]")
+        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c <file_name>] [-g <glasses>] [-size <width> <height>] [-convert png] [-angry] [-live]")
         sys.exit(1)
 
     text = sys.argv[1]
@@ -172,6 +222,7 @@ def main():
     speak = "-t" in sys.argv
     sound = "-s" in sys.argv
     custom = "-c" in sys.argv
+    angry = "-angry" in sys.argv
     bubble_shape = 'rounded'
     glasses = None
     width = 40
@@ -179,30 +230,21 @@ def main():
     convert_png = "-convert" in sys.argv and "png" in sys.argv
 
     if "-b" in sys.argv:
-        try:
-            bubble_shape = sys.argv[sys.argv.index("-b") + 1]
-        except IndexError:
-            print("Error: Missing argument for -b")
-            sys.exit(1)
+        bubble_shape = sys.argv[sys.argv.index("-b") + 1]
 
     if "-g" in sys.argv:
         glasses = sys.argv[sys.argv.index("-g") + 1]
 
     if "-size" in sys.argv:
-        try:
-            width = int(sys.argv[sys.argv.index("-size") + 1])
-            height = int(sys.argv[sys.argv.index("-size") + 2])
-        except IndexError:
-            print("Error: Missing arguments for -size")
-            sys.exit(1)
+        width = int(sys.argv[sys.argv.index("-size") + 1])
+        height = int(sys.argv[sys.argv.index("-size") + 2])
 
     if custom:
         custom_file = sys.argv[sys.argv.index("-c") + 1] if len(sys.argv) > sys.argv.index("-c") + 1 else "custom.txt"
         animal_art = load_custom_animal(custom_file)
-        console = Console()
         console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
     else:
-        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses, width, height)
+        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses, width, height, angry)
 
     if speak:
         tts_speak(text)
@@ -211,8 +253,8 @@ def main():
         play_sound(animal_name)
 
     if convert_png:
-        animal_art = animals.get(animal_name, animals.get("cow"))
-        convert_to_png(animal_art, width, height)
+        art = animal_art if custom else animal_name
+        convert_to_png(art, width, height)
 
 if __name__ == "__main__":
     main()
