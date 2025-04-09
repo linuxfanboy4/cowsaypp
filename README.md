@@ -1,12 +1,13 @@
-# cowsay++: Enhanced Version of cowsay (10.3.1)
+# cowsay++: Enhanced Version of cowsay (10.6.1)
 
 ## Overview
 
-cowsay++ is an enhanced version of the classic cowsay program, offering extended functionality for displaying ASCII art animals with speech bubbles. This Python implementation includes advanced features such as rainbow-colored output, multiple animal types, text-to-speech capabilities, sound effects, and animation support.
+cowsay++ is an significant and feature-rich enhanced version of the classic cowsay program, offering extended functionality for displaying ASCII art animals with speech bubbles. This Python implementation includes advanced features such as rainbow-colored output, multiple animal types, text-to-speech capabilities, sound effects, and animation support.
 
 ## Features
 
 - Multiple animal types (cow, dog, cat, fox) with angry variants
+- Vehicle types (car, train) added in 10.6.1
 - Marketplace for additional animals (elephant, tux, owl, fish)
 - Custom animal support via external files (custom.txt or specified filename)
 - Rainbow-colored text and ASCII art
@@ -16,11 +17,14 @@ cowsay++ is an enhanced version of the classic cowsay program, offering extended
 - Animal sound effects (cow and cat currently supported)
 - Customizable text wrapping and size
 - Glasses support for animals
+- Clothing options for cows (jacket, tshirt, lavender)
 - PNG conversion capability
 - Rich text formatting with color support
 - Weather information integration
 - Livestream mode with random messages
 - Angry animal variants
+- Cheap fortune mode for random facts
+- Vehicle support (car, train)
 
 ## Installation
 
@@ -61,12 +65,16 @@ Available options:
 - `-convert png`: Convert output to PNG image
 - `-angry`: Use angry animal variant
 - `-live`: Enter livestream mode
+- `-clothes <type>`: Dress the cow (jacket, tshirt, lavender)
+- `-vehicles <type>`: Display vehicle instead of animal (car, train)
+- `-cheap_fortune`: Display random fact
 - `see weather`: Display weather information
 
 Additional commands:
 ```bash
 cowsay-pp see weather
 cowsay-pp -live
+cowsay-pp -cheap_fortune -f cow
 ```
 
 Examples:
@@ -78,8 +86,12 @@ cowsay-pp "I'm cool" -f dog -g "8-)"
 cowsay-pp "Large output" -f fox -size 60 20
 cowsay-pp "Save as PNG" -f cow -convert png
 cowsay-pp "I'm angry" -f cat -angry
+cowsay-pp "Driving home" -vehicles car
+cowsay-pp "All aboard" -vehicles train
 cowsay-pp see weather
 cowsay-pp -live
+cowsay-pp -cheap_fortune -f cow
+cowsay-pp "Fancy cow" -f cow -clothes lavender
 ```
 
 ## Marketplace
@@ -123,6 +135,23 @@ Available angry animal variants:
 
 Use the `-angry` flag to display the angry version of the selected animal.
 
+## Vehicle Support
+
+New in version 10.6.1:
+- Car
+- Train
+
+Use the `-vehicles` option to display these instead of animals.
+
+## Clothing Options
+
+Available cow clothing:
+- Jacket
+- Tshirt
+- Lavender (fancy pattern)
+
+Use the `-clothes` option to dress up your cow.
+
 ## PNG Conversion
 
 The `-convert png` option saves the ASCII art as a PNG image file named `output.png` in the current directory.
@@ -134,6 +163,10 @@ The `see weather` command displays current weather conditions and provides recom
 ## Livestream Mode
 
 The `-live` option activates livestream mode, which displays random messages about streaming platforms.
+
+## Cheap Fortune Mode
+
+The `-cheap_fortune` option displays random interesting facts instead of your message.
 
 ## Technical Implementation
 
@@ -166,3 +199,6 @@ This is an actively maintained project. New features and improvements are regula
 7. Weather functionality requires an internet connection
 8. Angry variants provide alternative ASCII art for each animal
 9. Livestream mode displays random messages about streaming platforms
+10. Vehicle support was added in version 10.6.1
+11. Clothing options are currently only available for cows
+12. Cheap fortune mode provides random interesting facts
