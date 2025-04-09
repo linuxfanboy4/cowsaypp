@@ -4,4 +4,4 @@ cd cowsaypp
 cd src 
 pip install -r requirements.txt
 sudo mv cowsaypp.py /usr/local/bin/cowsaypp
-python3 cowsaypp.py
+echo "cowsay++ is successfully installed, Installed version is 10.5.3"
