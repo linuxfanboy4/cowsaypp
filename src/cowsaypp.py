@@ -53,8 +53,8 @@ def print_speech_bubble(text, bubble_shape='rounded', glasses=None, width=40):
         bottom = f"  {'v' * (max_line_length + 2)}"
         sides = [f" / {line.ljust(max_line_length)} \\" for line in lines]
     elif bubble_shape == 'cloud':
-        top = f"   .-" + "-" * (max_line_length + 2) + '-.'
-        bottom = f"  `-'`-" * (max_line_length + 2) + '`-`'
+        top = f"   .-{'-' * (max_line_length + 2)}-."
+        bottom = f"  `-'`-{'-' * (max_line_length + 2)}`-`"
         sides = [f" ( {line.ljust(max_line_length)} )" for line in lines]
     else:
         raise ValueError(f"Unknown bubble shape: {bubble_shape}")
@@ -66,94 +66,90 @@ def print_speech_bubble(text, bubble_shape='rounded', glasses=None, width=40):
 
     return "\n".join(bubble)
 
-def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None, width=40, height=10, angry=False):
-    animals = {
-        "cow": r'''
-          \   ^__^
-           \  (oo)\_______
-              (__)\       )\/\
-                  ||----w |
-                  ||     ||
-        ''',
-        "cow-angry": r'''
-          \   ^!!^
-           \  (><)\_______
-              (__)\       )\/\
-                  ||----# |
-                  ||     ||
-        ''',
-        "dog": r'''
-        \   / \__
-        (    @\___
+def print_animal(name, text, rainbow=False, bubble_shape='rounded', animate=False, glasses=None, width=40, height=10, angry=False, clothes=None):
+    if text.lower() == "i hate cow" and name == "cow":
+        console.print(" __________\n< hell you \U0001F95A >\n ----------\n>__<\n    (\u00ac\u00ac)\\_______\n    (__)\\       )\\/\\\n        ||----m |\n        ||     ||")
+        return
+
+    if text.lower().strip() == "never gonna give you up" and name == "cow":
+        console.print("\\   ^__^\n         \\  (\u2310\u25a0_\u25a0)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||")
+        return
+
+    if clothes == "jacket" and name == "cow":
+        art = "\\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n             ||---------||\n             ||  ___    ||  \n             || |___|   ||  \n            /|| |___|   ||\\ \n           /_||         ||_\\\n          (__)|_________|(__)\n             ||         ||\n             ^^         ^^"
+    elif clothes == "tshirt" and name == "cow":
+        art = "\\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n             ||  _____  ||\n             || /     \\ ||\n             |||       |||\n             ||\\_____/ || \n             ||         ||\n             ^^         ^^"
+    elif clothes == "lavender" and name == "cow":
+        art = "\\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n             ||  _____  ||\n             || /     \\ ||  \n             ||| \u2588\u2588\u2592 \u2592\u2588 |||  \n             ||\\__\u25b2\u25b2__/ ||   \n             ||         ||\n             ^^         ^^"
+    else:
+        animals = {
+            "cow": r'''\\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\/\
+                ||----w |
+                ||     ||''',
+            "cow-angry": r'''\\   ^!!^
+         \\  (><)\\_______
+            (__)\\       )\/\
+                ||----# |
+                ||     ||''',
+            "dog": r'''\\   / \\__
+        (    @\\___
         /         O
       /   (_____ /
-     /_____/   U
-        ''',
-        "dog-angry": r'''
-        \   / \__
+     /_____/   U''',
+            "dog-angry": r'''\\   / \\__
         (    >@___
         /         #
       /   (_____ /
-     /_____/   U
-        ''',
-        "cat": [r'''
-        /\_/\
+     /_____/   U''',
+            "cat": [r'''        /\\_/\\
        ( o.o )
-        > ^ <
-        ''', r'''
-        /\_/\
+        > ^ <''', r'''        /\\_/\\
        ( -.- )
-        > ^ <
-        '''],
-        "cat-angry": [r'''
-        /\_/\
+        > ^ <'''],
+            "cat-angry": [r'''        /\\_/\\
        ( >.< )
-        > ^ <
-        ''', r'''
-        /\_/\
+        > ^ <''', r'''        /\\_/\\
        ( x.x )
-        > ^ <
-        '''],
-        "fox": [r'''
-       /\   /\
+        > ^ <'''],
+            "fox": [r'''       /\\   /\\
       ( o . o )
        (  V  )
-       /     \
-        ''', r'''
-      /\   /\
+       /     \\''', r'''      /\\   /\\
       ( - . - )
        (  V  )
-       /     \
-        '''],
-        "fox-angry": [r'''
-       /\   /\
+       /     \\'''],
+            "fox-angry": [r'''       /\\   /\\
       ( > . < )
        (  V  )
-       /     \
-        ''', r'''
-      /\   /\
+       /     \\''', r'''      /\\   /\\
       ( x . x )
        (  V  )
-       /     \
-        ''']
-    }
+       /     \\'''],
+            "car": r"""
+      ______
+      /|_||_\\`.__
+     (   _    _ _\\
+     =`-(_)--(_)-'
+""",
+            "train": r"""
+o O __    _________
+   _ ][__| o |  |  O O O O|   
+<_______|__|__|___________|   
+ / 0-0-0      o-o-o-o-o-o  \  
+~~~   ~~~~~~~~~ ~~~~~ ~~~~~~
+"""
+        }
+        key = name + "-angry" if angry else name
+        art = animals.get(key, animals.get("cow"))
 
     speech_bubble = print_speech_bubble(text, bubble_shape, glasses, width)
     if rainbow:
         console.print(rainbow_text(speech_bubble))
     else:
         console.print(speech_bubble)
-
-    key = name + "-angry" if angry else name
-
-    if key in ["cat", "fox", "cat-angry", "fox-angry"] and animate:
-        for frame in animals[key]:
-            console.print(rainbow_ascii(frame) if rainbow else frame)
-            time.sleep(0.5)
-            console.clear()
-    else:
-        art = animals.get(key, animals.get("cow"))
-        console.print(rainbow_ascii(art) if rainbow else art)
+    console.print(rainbow_ascii(art) if rainbow else art)
 
 def play_sound(animal):
     sounds = {
@@ -187,20 +183,29 @@ def get_weather():
     result = response.text.strip()
     condition = result.split()[0]
     if condition == "Sunny":
-        print("Man, it's kind of hot 🔥🔥🔥 you gotta go Antarctica or Switzerland")
+        print("Man, it's kind of hot \ud83d\udd25\ud83d\udd25\ud83d\udd25 you gotta go Antarctica or Switzerland")
     elif condition == "Clear":
-        print("Man, there's few or even no cloud ☁️ I warned you that still you had time, go to Antarctica or Switzerland")
+        print("Man, there's few or even no cloud \u2601\ufe0f I warned you that still you had time, go to Antarctica or Switzerland")
     else:
         print(f"Weather says: {result}")
 
 def livestream_mode():
     messages = [
-        "what in the world this is 😒",
-        "it's better I should uninstall twitch 😒",
+        "what in the world this is \ud83d\ude12",
+        "it's better I should uninstall twitch \ud83d\ude12",
         "it's always good practice to not watch live"
     ]
     msg = random.choice(messages)
     print_animal("cow", msg, angry=True)
+
+def cheap_fortune():
+    facts = [
+        "do you know batman was created in 1939 and now he's an gigachad",
+        "do you know that some cows also lived bit lavish and rich like an cow called 'lavender'",
+        "if you never drink water, you're literally an dry fish",
+        "bees tell directions with dance, you don't even call back your friends"
+    ]
+    return random.choice(facts)
 
 def main():
     if len(sys.argv) >= 2 and sys.argv[1].lower() == "see" and sys.argv[2].lower() == "weather":
@@ -211,12 +216,16 @@ def main():
         livestream_mode()
         return
 
-    if len(sys.argv) < 4:
-        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c <file_name>] [-g <glasses>] [-size <width> <height>] [-convert png] [-angry] [-live]")
+    if "-cheap_fortune" in sys.argv:
+        text = cheap_fortune()
+        animal_name = sys.argv[sys.argv.index("-f") + 1] if "-f" in sys.argv else "cow"
+    elif len(sys.argv) < 4:
+        print("Usage: cowsay-pp '<text>' -f <animal_name> [-r] [-b <bubble_shape>] [-a] [-t] [-s] [-c <file_name>] [-g <glasses>] [-size <width> <height>] [-convert png] [-angry] [-live] [-clothes jacket|tshirt|lavender] [-vehicles car|train] [-cheap_fortune]")
         sys.exit(1)
+    else:
+        text = sys.argv[1]
+        animal_name = sys.argv[3].lower()
 
-    text = sys.argv[1]
-    animal_name = sys.argv[3].lower()
     rainbow = "-r" in sys.argv
     animate = "-a" in sys.argv
     speak = "-t" in sys.argv
@@ -225,6 +234,7 @@ def main():
     angry = "-angry" in sys.argv
     bubble_shape = 'rounded'
     glasses = None
+    clothes = None
     width = 40
     height = 10
     convert_png = "-convert" in sys.argv and "png" in sys.argv
@@ -239,12 +249,18 @@ def main():
         width = int(sys.argv[sys.argv.index("-size") + 1])
         height = int(sys.argv[sys.argv.index("-size") + 2])
 
+    if "-clothes" in sys.argv:
+        clothes = sys.argv[sys.argv.index("-clothes") + 1].lower()
+
+    if "-vehicles" in sys.argv:
+        animal_name = sys.argv[sys.argv.index("-vehicles") + 1].lower()
+
     if custom:
         custom_file = sys.argv[sys.argv.index("-c") + 1] if len(sys.argv) > sys.argv.index("-c") + 1 else "custom.txt"
         animal_art = load_custom_animal(custom_file)
         console.print(rainbow_ascii(animal_art) if rainbow else animal_art)
     else:
-        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses, width, height, angry)
+        print_animal(animal_name, text, rainbow, bubble_shape, animate, glasses, width, height, angry, clothes)
 
     if speak:
         tts_speak(text)
