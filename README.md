@@ -1,6 +1,4 @@
-Here's the updated README based on the provided code, maintaining all the existing content while incorporating the new features and removing emojis:
-
-# cowsay++: Enhanced Version of cowsay
+# cowsay++: Enhanced Version of cowsay (10.3.1)
 
 ## Overview
 
